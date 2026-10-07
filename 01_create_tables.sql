@@ -1,0 +1,111 @@
+CREATE DATABASE SmartLibrary;
+USE SmartLibrary;
+
+CREATE TABLE MEMBER (
+    Member_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Member_Name VARCHAR(100) NOT NULL,
+    Email VARCHAR(150) UNIQUE NOT NULL,
+    Phone VARCHAR(15),
+    Department VARCHAR(100),
+    Join_Date DATE NOT NULL,
+    Membership_Type VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE PUBLISHER (
+    Publisher_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Publisher_Name VARCHAR(150) NOT NULL,
+    Address VARCHAR(255)
+);
+
+CREATE TABLE AUTHOR (
+    Author_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Author_Name VARCHAR(150) NOT NULL,
+    Biography TEXT
+);
+
+CREATE TABLE CATEGORY (
+    Category_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Category_Name VARCHAR(100) NOT NULL,
+    Description TEXT
+);
+
+CREATE TABLE BOOK (
+    Book_ID INT AUTO_INCREMENT PRIMARY KEY,
+    ISBN VARCHAR(20) UNIQUE NOT NULL,
+    Title VARCHAR(255) NOT NULL,
+    Publication_Year YEAR,
+    Language VARCHAR(50),
+    Edition VARCHAR(50),
+    Copies_Available INT DEFAULT 0,
+    Publisher_ID INT NOT NULL,
+    FOREIGN KEY (Publisher_ID) REFERENCES PUBLISHER(Publisher_ID)
+);
+
+CREATE TABLE BOOK_AUTHOR (
+    Book_ID INT,
+    Author_ID INT,
+    PRIMARY KEY (Book_ID, Author_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID),
+    FOREIGN KEY (Author_ID) REFERENCES AUTHOR(Author_ID)
+);
+
+CREATE TABLE BOOK_CATEGORY (
+    Book_ID INT,
+    Category_ID INT,
+    PRIMARY KEY (Book_ID, Category_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID),
+    FOREIGN KEY (Category_ID) REFERENCES CATEGORY(Category_ID)
+);
+
+CREATE TABLE BOOK_KEYWORD (
+    Book_ID INT,
+    Keyword VARCHAR(100),
+    PRIMARY KEY (Book_ID, Keyword),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID)
+);
+
+CREATE TABLE BORROWING (
+    Borrow_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Member_ID INT NOT NULL,
+    Book_ID INT NOT NULL,
+    Issue_Date DATE NOT NULL,
+    Due_Date DATE NOT NULL,
+    Return_Date DATE,
+    Fine_Amount DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (Member_ID) REFERENCES MEMBER(Member_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID)
+);
+
+CREATE TABLE RESERVATION (
+    Reservation_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Member_ID INT NOT NULL,
+    Book_ID INT NOT NULL,
+    Reservation_Date DATE NOT NULL,
+    Status VARCHAR(30) NOT NULL,
+    FOREIGN KEY (Member_ID) REFERENCES MEMBER(Member_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID)
+);
+
+CREATE TABLE RATING (
+    Rating_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Member_ID INT NOT NULL,
+    Book_ID INT NOT NULL,
+    Rating_Value TINYINT NOT NULL,
+    Review TEXT,
+    Rating_Date DATE NOT NULL,
+    FOREIGN KEY (Member_ID) REFERENCES MEMBER(Member_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID),
+    CHECK (Rating_Value BETWEEN 1 AND 5),
+    UNIQUE (Member_ID, Book_ID)
+);
+
+CREATE TABLE RECOMMENDATION (
+    Recommendation_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Member_ID INT NOT NULL,
+    Book_ID INT NOT NULL,
+    Recommendation_Date DATE NOT NULL,
+    Recommendation_Score DECIMAL(5,2),
+    Recommendation_Reason TEXT,
+    FOREIGN KEY (Member_ID) REFERENCES MEMBER(Member_ID),
+    FOREIGN KEY (Book_ID) REFERENCES BOOK(Book_ID)
+);
